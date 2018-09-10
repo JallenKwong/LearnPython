@@ -19,7 +19,7 @@ if len(imagenamelist) <= 1:
     exit()
 
 frames = []
-duration = 3
+duration = 0.15
 
 for imagename in imagenamelist:
     
