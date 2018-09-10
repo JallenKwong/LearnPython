@@ -8,3 +8,4 @@
 - 运行main.py脚本
 - 工作目录内会创建结果文件result.gif
 
+![](result.gif)
