@@ -22,7 +22,7 @@ firstImage = Image.open(folderName + imagenamelist[0])
 width, height = firstImage.size # 
 
 # 底部字幕的高度 ，所以图片要截取的位置是(0, 400 - 55 + 1,720 , 400)
-cropHeight = 55
+cropHeight = 100
 
 imagelist = []
 imagelist.append(firstImage)
