@@ -586,3 +586,124 @@ OrderedDict内部维护了一个双向链表，注意性能上的问题。
 			...
 
 ## 对切片命名 ##
+
+	###### 0123456789012345678901234567890123456789012345678901234567890'
+	record = '....................100 .......513.25 ..........'
+	cost = int(record[20:32]) * float(record[40:48])
+
+
+	SHARES = slice(20,32)
+	PRICE = slice(40,48)
+	cost = int(record[SHARES]) * float(record[PRICE])
+
+---
+
+`slice()`创建一个切片对象
+
+	>>> items = [0, 1, 2, 3, 4, 5, 6]
+	>>> a = slice(2, 4)
+	>>> items[2:4]
+	[2, 3]
+	>>> items[a]
+	[2, 3]
+	>>> items[a] = [10,11]
+	>>> items
+	[0, 1, 10, 11, 4, 5, 6]
+	>>> del items[a]
+	>>> items
+	[0, 1, 4, 5, 6]
+
+---
+
+	>>> a = slice(10, 50, 2)
+	>>> a.start
+	10
+	>>> a.stop
+	50
+	>>> a.step
+	2
+	>>>
+
+---
+
+可以通过使用indices(size)方法将切片映射到特定大小的序列上。
+
+	>>> s = 'HelloWorld'
+	>>> a.indices(len(s))
+	(5, 10, 2)
+	>>> for i in range(*a.indices(len(s))):
+	... print(s[i])
+	...
+	W
+	r
+	d
+	>>>
+
+## 找出序列中出现次数最多的元素 ##
+
+使用collections模块终的Counter类。
+
+	words = [
+		'look', 'into', 'my', 'eyes', 'look', 'into', 'my', 'eyes',
+		'the', 'eyes', 'the', 'eyes', 'the', 'eyes', 'not', 'around', 'the',
+		'eyes', "don't", 'look', 'around', 'the', 'eyes', 'look', 'into',
+		'my', 'eyes', "you're", 'under'
+	]
+
+	from collections import Counter
+	word_counts = Counter(words)
+	top_three = word_counts.most_common(3)
+	print(top_three)
+	# Outputs [('eyes', 8), ('the', 5), ('look', 4)]
+
+可以给Counter对象提供任何可哈希的对象序列作为输入。在底层实现中，Counter是一个字典，在元素和它们出现的次数间做了映射。
+
+	>>> word_counts['not']
+	1
+	>>> word_counts['eyes']
+	8
+	>>>
+
+可以手动增加计数，只需简单地自增即可
+
+	>>> morewords = ['why','are','you','not','looking','in','my','eyes']
+	>>> for word in morewords:
+	... word_counts[word] += 1
+	...
+	>>> word_counts['eyes']
+	9
+	>>>
+
+或者
+
+	>>> word_counts.update(morewords)
+	>>>
+
+---
+
+Counter可以使用各种数学运算操作结合起来使用。
+
+	>>> a = Counter(words)
+	>>> b = Counter(morewords)
+	>>> a
+	Counter({'eyes': 8, 'the': 5, 'look': 4, 'into': 3, 'my': 3, 'around': 2,
+	"you're": 1, "don't": 1, 'under': 1, 'not': 1})
+	>>> b
+	Counter({'eyes': 1, 'looking': 1, 'are': 1, 'in': 1, 'not': 1, 'you': 1,
+	'my': 1, 'why': 1})
+
+	>>> # Combine counts
+	>>> c = a + b
+	>>> c
+	Counter({'eyes': 9, 'the': 5, 'look': 4, 'my': 4, 'into': 3, 'not': 2,
+	'around': 2, "you're": 1, "don't": 1, 'in': 1, 'why': 1,
+	'looking': 1, 'are': 1, 'under': 1, 'you': 1})
+
+	>>> # Subtract counts
+	>>> d = a - b
+	>>> d
+	Counter({'eyes': 7, 'the': 5, 'look': 4, 'into': 3, 'my': 2, 'around': 2,
+	"you're": 1, "don't": 1, 'under': 1})
+	>>>
+
+## 通过公共键对字典列表排序 ##
