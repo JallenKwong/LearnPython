@@ -763,3 +763,93 @@ itemgetter()可以接受多个键。
 	>>>
 
 ## 对不原生支持比较操作的对象排序 ##
+
+	class User:
+		def __init__(self, user_id):
+			self.user_id = user_id
+		def __repr__(self):
+			return 'User({})'.format(self.user_id)
+
+	>>> users = [User(23), User(3), User(99)]
+	>>> users
+	[User(23), User(3), User(99)]
+	>>> sorted(users, key=lambda u: u.user_id)
+	[User(3), User(23), User(99)]
+	>>>
+
+不用lambda，而是使用`operator.attrgetter()`
+
+	>>> from operator import attrgetter
+	>>> sorted(users, key=attrgetter('user_id'))
+	[User(3), User(23), User(99)]
+	>>>
+
+	by_name = sorted(users, key=attrgetter('last_name', 'first_name'))
+
+`operator.attrgetter()`
+
+	>>> min(users, key=attrgetter('user_id')
+	User(3)
+	>>> max(users, key=attrgetter('user_id')
+	User(99)
+	>>>
+
+## 根据字段将记录分组 ##
+
+	from operator import itemgetter
+	from itertools import groupby
+
+	rows = [
+		{'address': '5412 N CLARK', 'date': '07/01/2012'},
+		{'address': '5148 N CLARK', 'date': '07/04/2012'},
+		{'address': '5800 E 58TH', 'date': '07/02/2012'},
+		{'address': '2122 N CLARK', 'date': '07/03/2012'},
+		{'address': '5645 N RAVENSWOOD', 'date': '07/02/2012'},
+		{'address': '1060 W ADDISON', 'date': '07/02/2012'},
+		{'address': '4801 N BROADWAY', 'date': '07/01/2012'},
+		{'address': '1039 W GRANVILLE', 'date': '07/04/2012'},
+	]
+
+	# Sort by the desired field first
+	rows.sort(key=itemgetter('date'))
+
+	# Iterate in groups
+	for date, items in groupby(rows, key=itemgetter('date')):
+		print(date)
+		for i in items:
+			print(' ', i)
+
+输出结果
+
+	07/01/2012
+		{'date': '07/01/2012', 'address': '5412 N CLARK'}
+		{'date': '07/01/2012', 'address': '4801 N BROADWAY'}
+	07/02/2012
+		{'date': '07/02/2012', 'address': '5800 E 58TH'}
+		{'date': '07/02/2012', 'address': '5645 N RAVENSWOOD'}
+		{'date': '07/02/2012', 'address': '1060 W ADDISON'}
+	07/03/2012
+		{'date': '07/03/2012', 'address': '2122 N CLARK'}
+	07/04/2012
+		{'date': '07/04/2012', 'address': '5148 N CLARK'}
+		{'date': '07/04/2012', 'address': '1039 W GRANVILLE'}
+
+---
+
+可以使用 [一键多值](#在字典中将键映射到多个值上) 来做分组。
+
+	from collections import defaultdict
+	rows_by_date = defaultdict(list)
+	for row in rows:
+		rows_by_date[row['date']].append(row)
+
+	>>> for r in rows_by_date['07/01/2012']:
+	... print(r)
+	...
+	{'date': '07/01/2012', 'address': '5412 N CLARK'}
+	{'date': '07/01/2012', 'address': '4801 N BROADWAY'}
+	>>>
+
+## 筛选序列中的元素 ##
+
+
