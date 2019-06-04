@@ -707,3 +707,59 @@ Counter可以使用各种数学运算操作结合起来使用。
 	>>>
 
 ## 通过公共键对字典列表排序 ##
+
+使用operator模块的itemgetter方法
+
+	rows = [
+		{'fname': 'Brian', 'lname': 'Jones', 'uid': 1003},
+		{'fname': 'David', 'lname': 'Beazley', 'uid': 1002},
+		{'fname': 'John', 'lname': 'Cleese', 'uid': 1001},
+		{'fname': 'Big', 'lname': 'Jones', 'uid': 1004}
+	]
+
+	from operator import itemgetter
+
+	rows_by_fname = sorted(rows, key=itemgetter('fname'))
+	rows_by_uid = sorted(rows, key=itemgetter('uid'))
+
+	print(rows_by_fname)
+	print(rows_by_uid)
+
+输出为
+
+	[{'fname': 'Big', 'uid': 1004, 'lname': 'Jones'},
+	{'fname': 'Brian', 'uid': 1003, 'lname': 'Jones'},
+	{'fname': 'David', 'uid': 1002, 'lname': 'Beazley'},
+	{'fname': 'John', 'uid': 1001, 'lname': 'Cleese'}]
+
+	[{'fname': 'John', 'uid': 1001, 'lname': 'Cleese'},
+	{'fname': 'David', 'uid': 1002, 'lname': 'Beazley'},
+	{'fname': 'Brian', 'uid': 1003, 'lname': 'Jones'},
+	{'fname': 'Big', 'uid': 1004, 'lname': 'Jones'}]
+
+itemgetter()可以接受多个键。
+
+	rows_by_lfname = sorted(rows, key=itemgetter('lname','fname'))
+	print(rows_by_lfname)
+
+	[{'fname': 'David', 'uid': 1002, 'lname': 'Beazley'},
+	{'fname': 'John', 'uid': 1001, 'lname': 'Cleese'},
+	{'fname': 'Big', 'uid': 1004, 'lname': 'Jones'},
+	{'fname': 'Brian', 'uid': 1003, 'lname': 'Jones'}]
+
+有时候会用lamda表达式来取代`itemgetter()`
+
+	rows_by_fname = sorted(rows, key=lambda r: r['fname'])
+	rows_by_lfname = sorted(rows, key=lambda r: (r['lname'],r['fname']))
+
+通常`itemgetter()`比lambda的性能好。
+
+`min()` and `max()`同样适用`itemgetter()`。
+
+	>>> min(rows, key=itemgetter('uid'))
+	{'fname': 'John', 'lname': 'Cleese', 'uid': 1001}
+	>>> max(rows, key=itemgetter('uid'))
+	{'fname': 'Big', 'lname': 'Jones', 'uid': 1004}
+	>>>
+
+## 对不原生支持比较操作的对象排序 ##
