@@ -852,4 +852,129 @@ itemgetter()可以接受多个键。
 
 ## 筛选序列中的元素 ##
 
+使用列表推导式list comprehension
+
+	>>> mylist = [1, 4, -5, 10, -7, 2, 3, -1]
+	>>> [n for n in mylist if n > 0]
+	[1, 4, 10, 2, 3]
+	>>> [n for n in mylist if n < 0]
+	[-5, -7, -1]
+	>>>
+
+若原始输入非常大，可使用生成器表达式
+
+	>>> pos = (n for n in mylist if n > 0)
+	>>> pos
+	<generator object <genexpr> at 0x1006a0eb0>
+	>>> for x in pos:
+	... print(x)
+	...
+	1
+	4
+	10
+	2
+	3
+	>>>
+
+有时候筛选的标准没法简单地表示在列表推导式或生成器表达式中。
+
+例如：假设筛选过程涉及异常处理或者其他一些复杂的细节。
+
+使用内置的`filter()`
+
+	values = ['1', '2', '-3', '-', '4', 'N/A', '5']
+
+	def is_int(val):
+		try:
+			x = int(val)
+			return True
+		except ValueError:
+			return False
+
+	ivals = list(filter(is_int, values))
+	print(ivals)
+	# Outputs ['1', '2', '-3', '4', '5']
+
+---
+
+	>>> mylist = [1, 4, -5, 10, -7, 2, 3, -1]
+	>>> import math
+	>>> [math.sqrt(n) for n in mylist if n > 0]
+	[1.0, 2.0, 3.1622776601683795, 1.4142135623730951, 1.7320508075688772]
+	>>>
+
+不想筛选，只是简单的替换
+
+	>>> clip_neg = [n if n > 0 else 0 for n in mylist]
+	>>> clip_neg
+	[1, 4, 0, 10, 0, 2, 3, 0]
+	>>> clip_pos = [n if n < 0 else 0 for n in mylist]
+	>>> clip_pos
+	[0, 0, -5, 0, -7, 0, 0, -1]
+	>>>
+
+另一种筛选工具`itertools.compress()`，它接受一个可迭代对象以及一个布尔选择器序列作为输入。输出时，它会给出所有在相应的布尔选择器为True的可迭代对象元素。
+
+如果想把对一个序列的筛选结果施加到另一个相关的序列上时，这就很有用。
+
+	addresses = [
+		'5412 N CLARK',
+		'5148 N CLARK',
+		'5800 E 58TH',
+		'2122 N CLARK'
+		'5645 N RAVENSWOOD',
+		'1060 W ADDISON',
+		'4801 N BROADWAY',
+		'1039 W GRANVILLE',
+	]
+
+	counts = [ 0, 3, 10, 4, 1, 7, 6, 1]
+
+	>>> from itertools import compress
+	>>> more5 = [n > 5 for n in counts]
+	>>> more5
+	[False, False, True, False, False, True, True, False]
+	>>> list(compress(addresses, more5))
+	['5800 E 58TH', '4801 N BROADWAY', '1039 W GRANVILLE']
+	>>>
+
+## 从字典中提取子集 ##
+
+	prices = {
+		'ACME': 45.23,
+		'AAPL': 612.78,
+		'IBM': 205.55,
+		'HPQ': 37.20,
+		'FB': 10.75
+	}
+
+	# Make a dictionary of all prices over 200
+	p1 = { key:value for key, value in prices.items() if value > 200 }
+
+	# Make a dictionary of tech stocks
+	tech_names = { 'AAPL', 'IBM', 'HPQ', 'MSFT' }
+	p2 = { key:value for key,value in prices.items() if key in tech_names }
+
+使用字典推导式
+
+	p1 = dict((key, value) for key, value in prices.items() if value > 200)
+
+这种方法比较快。
+
+---
+
+还可以的写法
+
+	# Make a dictionary of tech stocks
+	tech_names = { 'AAPL', 'IBM', 'HPQ', 'MSFT' }
+	p2 = { key:prices[key] for key in prices.keys() & tech_names }
+
+这种方法就比较慢
+
+
+## 将名称映射到序列的元素中 ##
+
+
+
+
 
