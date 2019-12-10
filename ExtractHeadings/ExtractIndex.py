@@ -3,7 +3,7 @@
 #提取 # XX # 作索引 [1.XX](#XX), 直接打印出来
 
 import re
-chapterName = 'C:\Users\Administrator.USER-20180302VA\Desktop\Lab\ProgrammingCollectiveIntelligence\C07'.decode('utf-8')
+chapterName = '.'.decode('utf-8')
 
 fileName = chapterName + '\README.md' #''
 
