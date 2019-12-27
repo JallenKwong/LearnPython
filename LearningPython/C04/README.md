@@ -1,5 +1,65 @@
 # 介绍Python对象类型 #
 
+[1.为什么使用内置类型](#为什么使用内置类型)
+
+[1.1.Python核心数据类型](#python核心数据类型)
+
+[2.数字](#数字)
+
+[3.字符串](#字符串)
+
+[3.1.序列的操作](#序列的操作)
+
+[3.2.不可变性](#不可变性)
+
+[3.3.类型特定的方法](#类型特定的方法)
+
+[3.4.寻找帮助](#寻找帮助)
+
+[3.5.编写字符串的其他方法](#编写字符串的其他方法)
+
+[3.6.模式匹配](#模式匹配)
+
+[4.列表](#列表)
+
+[4.1.序列操作](#序列操作)
+
+[4.2.类型特定的操作](#类型特定的操作)
+
+[4.3.边界检查](#边界检查)
+
+[4.4.嵌套](#嵌套)
+
+[4.5.列表解析](#列表解析)
+
+[5.字典](#字典)
+
+[5.1.映射操作](#映射操作)
+
+[5.2.重返嵌套](#重返嵌套)
+
+[5.3.对键排序](#对键排序)
+
+[5.4.迭代和优化](#迭代和优化)
+
+[5.5.不存在的键：if测试](#不存在的键if测试)
+
+[6.元组](#元组)
+
+[6.1.为什么要用元组](#为什么要用元组)
+
+[7.文件](#文件)
+
+[7.1.其他文件类工具](#其他文件类工具)
+
+[8.其他核心类型](#其他核心类型)
+
+[8.1.如何破坏代码的灵活性](#如何破坏代码的灵活性)
+
+[8.2.用户定义的类](#用户定义的类)
+
+[9.小结](#小结)
+
 Python程序可以分解模块、语句、表达式以及对象：
 
 1. 程序由模块构成；
@@ -25,7 +85,7 @@ Python程序可以分解模块、语句、表达式以及对象：
 元组|(1,2,3)
 文件|open("myfile.txt",'w')
 集合|set('abc'),{'a','b','c'}
-其他类型|类型、None、布尔型
+其他类型|自定义类型、None、布尔型
 编程单元类型|函数、模块、类<br>（由def/class/import/lambda这样语句和表达式创建）
 与实现相关类型|编译的代码堆栈跟踪
 
@@ -469,14 +529,242 @@ Python是**动态类型**（它自动地跟踪你的类型而不是要求声明�
 
 ### 迭代和优化 ###
 
+	>>> squares = [x ** 2 for x in [1, 2, 3, 4, 5]]
+	>>> squares
+	[1, 4, 9, 16, 25]
+	
+	# 换成普通的写法
+	
+	>>> squares = []
+	>>> for x in [1, 2, 3, 4, 5]:       # This is what a list comprehension does
+	        squares.append(x ** 2)      # Both run the iteration protocol internally
+	
+	>>> squares
+	[1, 4, 9, 16, 25]
+
+Python中的一个主要的原则就是，首先为了简单和可读性去编写代码，在程序可以工作，并证明了确实有必要才考虑性能问题。（先运行后性能）
+
+### 不存在的键：if测试 ###
+
+	>>> D
+	{'a': 1, 'c': 3, 'b': 2}
+	>>> D['e'] = 99                      # Assigning new keys grows dictionaries
+	>>> D
+	{'a': 1, 'c': 3, 'b': 2, 'e': 99}
+	>>> D['f']                           # Referencing a nonexistent key is an error
+	...error text omitted...
+	KeyError: 'f'
+
+	>>> 'f' in D
+	False
+	>>> if not 'f' in D:
+			print('missing')
+
+	missing
+
+	# if测试不存在值，不给报出异常
+
+	>>> value = D.get('x', 0)                  # Index but with a default
+	>>> value
+	0
+	>>> value = D['x'] if 'x' in D else 0      # if/else expression form
+	>>> value
+	0
+
 
 ## 元组 ##
 
+	>>> T = (1, 2, 3, 4)                       # A 4-item tuple
+	>>> len(T)                                 # Length
+	4
+	>> T + (5, 6)                              # Concatenation
+	(1, 2, 3, 4, 5, 6)
+	>>> T[0]                                   # Indexing, slicing, and more
+	1
+
+
+	>>> T.index(4)                             # Tuple methods: 4 appears at offset 3
+	3
+	>>> T.count(4)                             # 4 appears once
+	1
+
+	# 元组元素不能更改
+
+	>>> T[0] = 2                               # Tuples are immutable
+	...error text omitted...
+	TypeError: 'tuple' object does not support item assignment
+
+
+
+	>>> T = ('spam', 3.0, [11, 22, 33])
+	>>> T[1]
+	3.0
+	>>> T[2][1]
+	22
+
+### 为什么要用元组 ###
+
+不可变性，提供了一种完整性的约束，对于大型的程序来说是很方便的。
 
 ## 文件 ##
 
+	>>> f = open('data.txt', 'w')    # Make a new file in output mode
+	>>> f.write('Hello\n')           # Write strings of bytes to it
+	6
+	>>> f.write('world\n')           # Returns number of bytes written in Python 3.0
+	6
+	>>> f.close()                    # Close to flush output buffers to disk
+
+
+
+	>>> f = open('data.txt')         # 'r' is the default processing mode
+	>>> text = f.read()              # Read entire file into a string
+	>>> text
+	'Hello\nworld\n'
+	>>> print(text)                  # print interprets control characters
+	Hello
+	world
+	>>> text.split()                 # File content is always a string
+	['Hello', 'world']
+
+
+	>>> dir(f)
+	>>> help(f.seek)
+	# Note: the following won't work unless you've already created a binary 
+	# data file in your working directory; to see how to do so, see the 
+	# files coverage of Chaptrer 9 later in this book. 
+
+	>>> data = open('data.bin', 'rb').read()     # Open binary file
+	>>> data                                     # bytes string holds binary data
+	b'\x00\x00\x00\x07spam\x00\x08'
+	>>> data[4:8]
+	b'spam'
+
+### 其他文件类工具 ###
+
+- 管道
+- 先进先出队列FIFO
+- 套接字
+- 对象持久
+- 基于描述符的文件
+- 关系数据库
+- 面向对象数据库接口
 
 ## 其他核心类型 ##
+
+	# set类型
+
+	>>> X = set('spam')                # Make a set out of a sequence in 2.6 and 3.0
+	>>> Y = {'h', 'a', 'm'}            # Make a set with new 3.0 set literals
+	>>> X, Y
+	({'a', 'p', 's', 'm'}, {'a', 'h', 'm'})
+	>>> X & Y                          # Intersection
+	{'a', 'm'}
+	>>> X | Y                          # Union
+	{'a', 'p', 's', 'h', 'm'}
+	>>> X – Y                          # Difference
+	{'p', 's'}
+	>>> {x ** 2 for x in [1, 2, 3, 4]} # Set comprehensions in 3.0
+	{16, 1, 4, 9}
+	>>> T.append(4)
+	AttributeError: 'tuple' object has no attribute 'append'
+
+	# 浮点数的局限性
+
+	>>> 1 / 3                              # Floating-point (use .0 in Python 2.6)
+	0.33333333333333331
+	>>> (2/3) + (1/2)
+	1.1666666666666665
+
+	# 十进制数（固定精度浮点数）
+
+	>>> import decimal                     # Decimals: fixed precision
+	>>> d = decimal.Decimal('3.141')
+	>>> d + 1
+	Decimal('4.141')
+
+	# 分数（有一个分子和一个分母的有理数）
+
+	>>> decimal.getcontext().prec = 2
+	>>> decimal.Decimal('1.00') / decimal.Decimal('3.00')
+	Decimal('0.33')
+
+	>>> from fractions import Fraction     # Fractions: numerator+denominator
+	>>> f = Fraction(2, 3)
+	>>> f + 1
+	Fraction(5, 3)
+	>>> f + Fraction(1, 2)
+	Fraction(7, 6)
+
+	# 布尔值
+
+	>>> 1 > 2, 1 < 2                       # Booleans
+	(False, True)
+	>>> bool('spam')
+	True
+
+	# None占位符
+	>>> X = None                           # None placeholder
+	>>> print(X)
+	None
+	>>> L = [None] * 100                   # Initialize a list of 100 Nones
+	>>> L
+	[None, None, None, None, None, None, None, None, None, None, None, None,
+	None, None, None, None, None, None, None, None, ...a list of 100 Nones...]
+
+### 如何破坏代码的灵活性 ###
+
+
+	# In Python 2.6:
+	>>> type(L)                     # Types: type of L is list type object
+	<type 'list'>
+	>>> type(type(L))               # Even types are objects
+	<type 'type'>
+
+	# In Python 3.0:
+	>>> type(L)                     # 3.0: types are classes, and vice versa
+	<class 'list'>
+	>>> type(type(L))               # See Chapter 31 for more on class types
+	<class 'type'>
+
+	# type()的作用：允许编写大妈来检查它所处理的对象的类型。
+
+	>>> if type(L) == type([]):     # Type testing, if you must...
+			print('yes')
+
+	yes
+	>>> if type(L) == list:         # Using the type name
+			print('yes')
+
+	yes
+	>>> if isinstance(L, list):     # Object-oriented tests
+			print('yes')
+
+	yes
+
+在代码中检验了特定的检测，实际上破坏了它的灵活性，即限制它只能使用一种类型工作。
+
+### 用户定义的类 ###
+
+	>>> class Worker:
+			def __init__(self, name, pay):       # Initialize when created
+				self.name = name                 # self is the new object
+				self.pay = pay
+			def lastName(self):
+				return self.name.split()[-1]     # Split string on blanks
+			def giveRaise(self, percent):
+				self.pay *= (1.0 + percent)      # Update pay in-place
+
+
+	>>> bob = Worker('Bob Smith', 50000)         # Make two instances
+	>>> sue = Worker('Sue Jones', 60000)         # Each has name and pay attrs
+	>>> bob.lastName()                           # Call method: bob is self
+	'Smith'
+	>>> sue.lastName()                           # sue is the self subject
+	'Jones'
+	>>> sue.giveRaise(.10)                       # Updates sue's pay
+	>>> sue.pay
+	66000.0
 
 
 ## 小结 ##
