@@ -22,4 +22,5 @@ def makePdf(pdfFileName, listPages):
 
     pdf.output(pdfFileName, "F")
 
-makePdf("result.pdf", [imgFileName for imgFileName in os.listdir('.') if imgFileName.endswith("png")])
+makePdf("result.pdf", [imgFileName for imgFileName in os.listdir('.') \
+                       if imgFileName.endswith("png")])
